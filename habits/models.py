@@ -69,7 +69,3 @@ class Feeling(models.Model):
         verbose_name = 'Чувство'
         verbose_name_plural = 'Чувства'
 
-
-from django.db import models
-
-# Create your models here.
