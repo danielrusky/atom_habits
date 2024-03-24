@@ -1,198 +1,143 @@
-from django.test import TestCase
 from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 
-# Create your tests here.
-from habits.models import Habit, Feeling
+from habit.models import Habit
 from users.models import User
 
 
-class LessonTestCase(APITestCase):
-
-    def setUp(self) -> None:
-        self.client = APIClient()
-        self.user = User.objects.create(
-            email='test1@test.sky.pro',
-            password='123test',
-        )
-
+class HabitAPITestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create(email='test@test.ru')
+        self.user.set_password('test_pass123')
+        self.user.save()
         self.client.force_authenticate(user=self.user)
-
-        self.course = Course.objects.create(
-            title='test',
-            description='test',
-            owner=self.user
+        self.habit = Habit.objects.create(
+            owner=self.user,
+            place='Тестовое место',
+            time='15:00:00',
+            action='Тестовое действие',
+            is_pleasant=False,
+            period='1',
+            reward='Тестовое вознаграждение',
+            time_to_complete=85,
+            is_public=True,
         )
 
-    def test_create_lesson(self):
-        data = {
-            'course': self.course.id,
-            'title': 'test',
-            'description': 'test',
-            'image': '',
-            'url_video': 'https://www.youtube.com/watch?v=Zst2ps35XiQ'
-        }
-
-        response = self.client.post('/lesson/create/', data=data)
-        print(response.json())
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(
-            response.json(),
-            {
-                'id': 1,
-                'title': 'test',
-                'description': 'test',
-                'image': None,
-                'url_video': 'https://www.youtube.com/watch?v=Zst2ps35XiQ',
-                'owner': 1,
-                'course': 1
-            }
-        )
-
-    def test_create_lesson_validation(self):
-        data = {
-            'course': self.course.id,
-            'title': 'test',
-            'description': 'test',
-            'image': '',
-            'url_video': 'https://www.vimeo.com/'
-        }
-
-        response = self.client.post('/lesson/create/', data=data)
-        print(response.json())
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(
-            response.json(),
-            {'non_field_errors': ['Недопустимая ссылка на видео']}
-        )
-
-    def test_list_lesson(self):
-        response = self.client.get(reverse('materials:lesson_list'))
-        print(response.json())
+    def test_habit_my_list(self):
+        response = self.client.get(reverse('habits'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()), 4)
-        self.assertEqual(response.json(), {'count': 0, 'next': None, 'previous': None, 'results': []})
+        self.assertEqual(response.json(),
+                         {
+                             'count': 1,
+                             'next': None,
+                             'previous': None,
+                             'results': [
+                                 {
+                                     'id': self.habit.id,
+                                     'place': self.habit.place,
+                                     'time': self.habit.time,
+                                     'action': self.habit.action,
+                                     'is_pleasant': self.habit.is_pleasant,
+                                     'foreign_habit': self.habit.foreign_habit,
+                                     'reward': self.habit.reward,
+                                     'time_to_complete': self.habit.time_to_complete,
+                                 }
+                             ]
+                         })
 
-    def test_retrieve_lesson(self):
+    def test_habit_detail(self):
+        response = self.client.get(reverse('habit', args=[self.habit.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(),
+                         {
+                             'id': self.habit.id,
+                             'place': self.habit.place,
+                             'time': self.habit.time,
+                             'action': self.habit.action,
+                             'is_pleasant': self.habit.is_pleasant,
+                             'foreign_habit': self.habit.foreign_habit,
+                             'period': self.habit.period,
+                             'reward': self.habit.reward,
+                             'time_to_complete': self.habit.time_to_complete,
+                             'is_public': self.habit.is_public,
+                         })
+
+    def test_habit_create(self):
         data = {
-            'course': self.course.id,
-            'title': 'test',
-            'description': 'test',
-            'image': '',
-            'url_video': 'https://www.youtube.com/watch?v=Zst2ps35XiQ'
+            'owner': self.user,
+            'place': 'Тестовое место 2',
+            'time': '16:00:00',
+            'action': 'Тестовое действие 2',
+            'is_pleasant': True,
+            'period': '5',
+            'reward': '',
+            'time_to_complete': 105,
+            'is_public': True,
         }
-        response = self.client.post('/lesson/create/', data=data)
-        print(response.json())
+        response = self.client.post(reverse('create_habit'), data=data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Habit.objects.count(), 2)
 
-        response = self.client.get('/lesson/1/')
-        print(response.json())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            response.json(),
-            {
-                'id': 1,
-                'title': 'test',
-                'description': 'test',
-                'image': None,
-                'url_video': 'https://www.youtube.com/watch?v=Zst2ps35XiQ',
-                'owner': 1,
-                'course': 1
-            }
-        )
-
-    def test_update_lesson(self):
+    def test_habit_validation(self):
         data = {
-            'course': self.course.id,
-            'title': 'test',
-            'description': 'test',
-            'image': '',
-            'url_video': 'https://www.youtube.com/watch?v=Zst2ps35XiQ'
+            'owner': self.user,
+            'place': 'Тестовое место 3',
+            'time': '17:00:00',
+            'action': 'Тестовое действие 3',
+            'is_pleasant': True,
+            'period': '5',
+            'reward': 'Вознаграждение',
+            'time_to_complete': 105,
+            'is_public': True,
         }
-        response = self.client.post('/lesson/create/', data=data)
-        print(response.json())
+        response = self.client.post(reverse('create_habit'), data=data)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(),
+                         {'Habit_validation_error': [
+                             'Связанная привычка или вознаграждение не могут быть указаны в приятной привычке']})
 
+    def test_habit_update(self):
         data = {
-            'course': self.course.id,
-            'title': 'UPDATED test',
-            'description': 'UPDATED test',
-            'image': '',
-            'url_video': 'https://www.youtube.com/watch?v=Zst2ps35XiQ'
+            'place': 'Тестовое место изменён',
+            'time': '18:00:00',
+            'action': 'Тестовое действие изменён',
+            'is_pleasant': True,
+            'period': '3',
+            'time_to_complete': 15,
+            'is_public': True,
         }
-        response = self.client.put('/lesson/update/1/', data=data)
-        print(response.json())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.put(reverse('update_habit', args=[self.habit.id]), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(),
+                         {
+                             'id': self.habit.id,
+                             'place': data['place'],
+                             'time': data['time'],
+                             'action': data['action'],
+                             'is_pleasant': data['is_pleasant'],
+                             'foreign_habit': self.habit.foreign_habit,
+                             'period': data['period'],
+                             'reward': self.habit.reward,
+                             'time_to_complete': data['time_to_complete'],
+                             'is_public': data['is_public'],
+                         })
 
-    def test_delete_lesson(self):
-        data = {
-            'course': self.course.id,
-            'title': 'test',
-            'description': 'test',
-            'image': '',
-            'url_video': 'https://www.youtube.com/watch?v=Zst2ps35XiQ'
-        }
-        response = self.client.post('/lesson/create/', data=data)
-        print(response.json())
+    def test_habit_destroy(self):
+        response = self.client.delete(reverse('delete_habit', args=[self.habit.id]))
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Habit.objects.count(), 0)
 
-        response = self.client.delete('/lesson/delete/1/')
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-
-class SubscriptionTestCase(APITestCase):
-
-    def setUp(self) -> None:
-        self.client = APIClient()
-        self.user = User.objects.create(
-            email='test1@test.sky.pro',
-            password='123test',
-        )
-
-        self.client.force_authenticate(user=self.user)
-
-        self.course = Course.objects.create(
-            title='test',
-            description='test',
-            owner=self.user
-        )
-
-    def test_create_subscription(self):
-        data = {
-            'user': self.user.id,
-            'course': self.course.id,
-        }
-
-        response = self.client.post('/subscription/create/', data=data)
-        print(response.json())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            response.json(),
-            {'message': 'подписка добавлена'}
-        )
-
-    def test_list_subscription(self):
-        response = self.client.get(reverse('materials:subscription_list'))
-        print(response.json())
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.json()), 4)
-        self.assertEqual(response.json(), {'count': 0, 'next': None, 'previous': None, 'results': []})
-
-    def test_delete_subscription(self):
-        data = {
-            'user': self.user.id,
-            'course': self.course.id,
-        }
-
-        response = self.client.post('/subscription/create/', data=data)
-
-        self.assertEqual(
-            response.json(),
-            {'message': 'подписка добавлена'}
-        )
-        print(response.json())
-
-        response = self.client.post('/subscription/create/', data=data)
-        self.assertEqual(
-            response.json(),
-            {'message': 'подписка удалена'}
-        )
-        print(response.json())
+    def test_all_habits(self):
+        response = self.client.get(reverse('all_habits'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(),
+                         [{
+                             'id': self.habit.id,
+                             'place': self.habit.place,
+                             'time': self.habit.time,
+                             'action': self.habit.action,
+                             'is_pleasant': self.habit.is_pleasant,
+                             'foreign_habit': self.habit.foreign_habit,
+                             'reward': self.habit.reward,
+                             'time_to_complete': self.habit.time_to_complete,
+                         }])
