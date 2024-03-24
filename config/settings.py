@@ -90,15 +90,14 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "atom_habits",
-        "USER": "postgres",
-        "PASSWORD": "1234",
-        "HOST": "127.0.0.1",
-        "PORT": 5432
+        "ENGINE": os.getenv('ENGINE'),
+        "NAME": os.getenv('NAME'),
+        "USER": os.getenv('USER'),
+        "PASSWORD": os.getenv('PASSWORD'),
+        "HOST": os.getenv('HOST'),
+        "PORT": os.getenv('PORT')
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
