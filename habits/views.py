@@ -1,10 +1,10 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from habits.models import Habit, Feeling
+from habits.models import Habit
 from habits.paginators import HabitPaginator
 from habits.permissions import IsOwner
-from habits.serializer import HabitSerializer, FeelingSerializer
+from habits.serializer import HabitSerializer
 
 
 class PublicHabitListApiView(generics.ListAPIView):
@@ -18,14 +18,13 @@ class PublicHabitListApiView(generics.ListAPIView):
 
 class HabitListApiView(generics.ListAPIView):
     """ Список привычек """
-    queryset = Habit.objects.all()
     serializer_class = HabitSerializer
     pagination_class = HabitPaginator
-    permission_classes = [IsOwner]
+    # permission_classes = [IsOwner]
 
     def get_queryset(self):
         user = self.request.user
-        return Habit.objects.filter(owner=user).order_by('id')
+        return Habit.objects.filter(owner=user.id).order_by('id')
 
 
 class HabitCreateApiView(generics.CreateAPIView):
@@ -53,39 +52,4 @@ class HabitDestroyAPIView(generics.DestroyAPIView):
     """ Удаление привычек """
     queryset = Habit.objects.all()
     serializer_class = HabitSerializer
-    permission_classes = [IsOwner]
-
-
-class FeelingListApiView(generics.ListAPIView):
-    """ Список чувств """
-    queryset = Feeling.objects.all()
-    serializer_class = FeelingSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class FeelingCreateApiView(generics.CreateAPIView):
-    """ Создание чувства """
-    queryset = Feeling.objects.all()
-    serializer_class = FeelingSerializer
-    permission_classes = [IsOwner]
-
-
-class FeelingRetrieveApiView(generics.RetrieveAPIView):
-    """ Чтение одного чувства """
-    queryset = Feeling.objects.all()
-    serializer_class = FeelingSerializer
-    permission_classes = [IsOwner]
-
-
-class FeelingUpdateApiView(generics.UpdateAPIView):
-    """ Обновление чувства """
-    queryset = Feeling.objects.all()
-    serializer_class = FeelingSerializer
-    permission_classes = [IsOwner]
-
-
-class FeelingDestroyAPIView(generics.DestroyAPIView):
-    """ Удаление чувств """
-    queryset = Feeling.objects.all()
-    serializer_class = FeelingSerializer
     permission_classes = [IsOwner]
