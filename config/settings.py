@@ -84,7 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -117,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -129,7 +127,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -138,7 +135,6 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = (
     BASE_DIR / 'static',
 )
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -213,3 +209,5 @@ CELERY_TASK_TRACK_STARTED = os.getenv('CELERY_TASK_TRACK_STARTED')
 
 # Максимальное время на выполнение задачи
 CELERY_TASK_TIME_LIMIT = os.getenv('CELERY_TASK_TIME_LIMIT')
+
+API_TELEGRAM_TOKEN = 'AAEJN0rRtF7Jw9LIk3k3CLFc92xoL7vbwlM'

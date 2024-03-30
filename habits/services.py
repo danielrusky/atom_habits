@@ -3,15 +3,20 @@ import requests
 from config import settings
 
 
-def send_telegram_message(telegram_id, message):
-    """Данные для отправки telegram_message пользователю в телеграмме"""
+class TelegramBot:
+    URL = 'https://api.telegram.org/bot'
+    TOKEN = settings.API_TELEGRAM_TOKEN
 
-    token = settings.API_TELEGRAM_TOKEN
-    url = f'https://api.telegram.org/bot{token}/sendMessage'
-    data = {
-        'chat_id': telegram_id,
-        'text': message
-    }
+    @classmethod
+    def send_message(cls, chat_id, text):
+        response = requests.post(
+            url=f'{cls.URL}{cls.TOKEN}/sendMessage',
+            data={
+                'chat_id': chat_id,
+                'text': text
+            }
+        )
+        response.raise_for_status()
 
-    response = requests.post(url, data=data)
-    response.raise_for_status()
+
+
