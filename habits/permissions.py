@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from users.models import UserRoles
+# from users.models import UserRoles
 
 
 class IsModerator(BasePermission):
