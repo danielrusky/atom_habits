@@ -3,24 +3,22 @@ from django.core.mail import send_mail
 from django.utils import timezone
 
 from config import settings
+from config.celery import app
 from .models import Habit
+from .services import TelegramBot
 
 
-@shared_task
+@app.task
 def check_habits_and_send_reminders():
-    # Проверка, истек ли срок действия привычки
     today = timezone.now().date()
-    habits = Habit.objects.select_related('user').all()
-
+    habits = Habit.objects.select_related('owner').all()
     for habit in habits:
-        if habit.last_completed is None or \
-                (today - habit.last_completed).days > habit.periodicity:
-            send_email_reminder(habit.user, habit)
-            send_telegram_reminder(habit.user, habit)
+        if habit.last_completed > today:
+            send_email_reminder(habit.owner, habit)
+            send_telegram_reminder(habit.owner, habit)
 
 
 def send_email_reminder(user, habit):
-    # отправка электронной почты
     send_mail(
         subject='Время завершить свою привычку!',
         message=f'Пришло время выполнить свою привычку: {habit.action}.'
@@ -32,8 +30,7 @@ def send_email_reminder(user, habit):
 
 
 def send_telegram_reminder(user, habit):
-    # отправка сообщение в приложение телеграмм
     if user.telegram_chat_id:
         message = f'Пришло время выполнить свою привычку: {habit.action}.' \
                   f'Вы установили, что это будет происходить каждые {habit.periodicity} дней.'
-        send_telegram_message(user.telegram_chat_id, message)
+        TelegramBot.send_message(user.telegram_chat_id, message)

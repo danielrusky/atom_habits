@@ -1,11 +1,11 @@
 import requests
 
-from config import settings
+# from config import settings
 
 
 class TelegramBot:
     URL = 'https://api.telegram.org/bot'
-    TOKEN = settings.API_TELEGRAM_TOKEN
+    TOKEN = '7000920511:AAEJN0rRtF7Jw9LIk3k3CLFc92xoL7vbwlM'
 
     @classmethod
     def send_message(cls, chat_id, text):
@@ -17,6 +17,4 @@ class TelegramBot:
             }
         )
         response.raise_for_status()
-
-
 
