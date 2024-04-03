@@ -1,5 +1,6 @@
 import requests
 
+
 # from config import settings
 
 
@@ -17,4 +18,3 @@ class TelegramBot:
             }
         )
         response.raise_for_status()
-
