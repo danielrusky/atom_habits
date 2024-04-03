@@ -1,9 +1,5 @@
-from datetime import timedelta
-from django.core.validators import MaxValueValidator
 from django.db import models
 from config import settings
-from habits.validators import validate_reward_and_habit, validate_pleasant_habit, \
-    validate_enjoyable_habit_without_reward_or_association
 
 NULLABLE = {'null': True, 'blank': True}
 
@@ -23,20 +19,6 @@ class Habit(models.Model):
 
     def __str__(self):
         return f'{self.action}'
-
-    def clean(self):
-        # Проверка одновременного заполнения полей вознаграждение и связанная_привычка
-        validate_reward_and_habit(self.reward, self.related_habit)
-
-        # Проверка того, что связанная привычка имеет признак приятной_привычки.
-        validate_pleasant_habit(self.related_habit, self.related_habit.nice_feeling if self.related_habit else False)
-
-        # Проверка того, что приятная привычка не может иметь награды или связанной с ней приятной_привычки.
-        validate_enjoyable_habit_without_reward_or_association(self.nice_feeling, self.reward, self.related_habit)
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Привычка'
