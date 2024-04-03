@@ -91,21 +91,15 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": os.getenv('ENGINE'),
+        "NAME": os.getenv('NAME'),
+        "USER": os.getenv('USER'),
+        "PASSWORD": os.getenv('PASSWORD'),
+        "HOST": os.getenv('HOST'),
+        "PORT": os.getenv('PORT')
     }
 }
-# DATABASES = {
-#     "default": {
-#         "ENGINE": os.getenv('ENGINE'),
-#         "NAME": os.getenv('NAME'),
-#         "USER": os.getenv('USER'),
-#         "PASSWORD": os.getenv('PASSWORD'),
-#         "HOST": os.getenv('HOST'),
-#         "PORT": os.getenv('PORT')
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -196,14 +190,12 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_ALL_ORIGINS = False
 
-STRIPE_API_KEY = os.getenv('STRIPE_API_KEY')
-
-API_TELEGRAM_TOKEN = 'AAEJN0rRtF7Jw9LIk3k3CLFc92xoL7vbwlM'
+API_TELEGRAM_TOKEN = os.getenv('API_TELEGRAM_TOKEN')
 
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_BROKER_TRANSPORT_VISIBILITY_TIMEOUT = 3600
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
-CELERY_ACCEPT_CONTENT = ['json','application/text']
+CELERY_ACCEPT_CONTENT = ['json', 'application/text']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_IMPORTS = ["habits.tasks"]
