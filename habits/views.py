@@ -20,7 +20,6 @@ class HabitListApiView(generics.ListAPIView):
     """ Список привычек """
     serializer_class = HabitListSerializer
     pagination_class = HabitPaginator
-    # permission_classes = [IsOwner]
 
     def get_queryset(self):
         user = self.request.user
