@@ -16,7 +16,7 @@ class HabitAPITestCase(APITestCase):
             place='Тестовое место',
             time='15:00:00',
             action='Тестовое действие',
-            is_pleasant=False,
+            nice_feeling=False,
             period='1',
             reward='Тестовое вознаграждение',
             time_to_complete=85,
@@ -48,52 +48,53 @@ class HabitAPITestCase(APITestCase):
         )
 
     def test_habit_detail(self):
-        response = self.client.get(reverse('habit', args=[self.habit.id]))
+        response = self.client.get(reverse('read_one_habit', args=[self.habit.id]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(),
             {
-                'id': self.habit.id,
-                'place': self.habit.place,
-                'time': self.habit.time,
-                'action': self.habit.action,
-                'is_pleasant': self.habit.is_pleasant,
-                'foreign_habit': self.habit.foreign_habit,
-                'period': self.habit.period,
-                'reward': self.habit.reward,
-                'time_to_complete': self.habit.time_to_complete,
-                'is_public': self.habit.is_public,
+                "id": self.habit.id,
+                "action": self.habit.action,
+                "nice_feeling": self.habit.nice_feeling,
+                "periodicity": self.habit.periodicity,
+                "last_completed": self.habit.last_completed,
+                "is_public": self.habit.is_public,
+                "owner": self.habit.owner,
+                "place": self.habit.place,
+                "duration": self.habit.duration,
+                "related_habit": self.habit.related_habit,
+                "reward": self.habit.reward
             }
         )
 
     def test_habit_create(self):
-        data = {
-            'owner': self.user,
-            'place': 'Тестовое место 2',
-            'time': '16:00:00',
-            'action': 'Тестовое действие 2',
-            'is_pleasant': True,
-            'period': '5',
-            'reward': '',
-            'time_to_complete': 105,
-            'is_public': True,
-        }
-        response = self.client.post(reverse('create_habit'), data=data)
+        data = dict(
+            owner=self.user,
+            place='Тестовое место 2',
+            time='11:00:00',
+            action='Тестовое действие 2',
+            is_pleasant=False,
+            period='6',
+            reward='Тестовое вознаграждение 2',
+            time_to_complete=60,
+            is_public=True,
+        )
+        response = self.client.post(reverse('habit_create'), data=data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Habit.objects.count(), 2)
 
     def test_habit_validation(self):
-        data = {
-            'owner': self.user,
-            'place': 'Тестовое место 3',
-            'time': '17:00:00',
-            'action': 'Тестовое действие 3',
-            'is_pleasant': True,
-            'period': '5',
-            'reward': 'Вознаграждение',
-            'time_to_complete': 105,
-            'is_public': True,
-        }
+        data = dict(
+            owner=self.user,
+            place='Тестовое место 3',
+            time='11:00:00',
+            action='Тестовое действие 3',
+            is_pleasant=False,
+            period='6',
+            reward='Тестовое вознаграждение 3',
+            time_to_complete=60,
+            is_public=True,
+        )
         response = self.client.post(reverse('create_habit'), data=data)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(),

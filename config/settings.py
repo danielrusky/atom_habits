@@ -164,10 +164,10 @@ REST_FRAMEWORK = {
     ],
 }
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=55),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-}
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=55),
+#     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+# }
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',  # Замените на адрес вашего фронтенд-сервера
