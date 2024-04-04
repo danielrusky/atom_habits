@@ -6,6 +6,7 @@ from habits.views import HabitCreateApiView, PublicHabitListApiView, HabitListAp
 
 app_name = HabitsConfig.name
 
+
 urlpatterns = [
     path('', PublicHabitListApiView.as_view(), name='public_habit'),
     path('habit/', HabitListApiView.as_view(), name='habit_list'),
