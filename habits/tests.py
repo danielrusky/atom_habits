@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
@@ -14,12 +16,12 @@ class HabitAPITestCase(APITestCase):
         self.habit = Habit.objects.create(
             owner=self.user,
             place='Тестовое место',
-            time='15:00:00',
+            duration='15:00:00',
             action='Тестовое действие',
-            is_pleasant=False,
-            period='1',
+            nice_feeling=False,
+            periodicity='1',
             reward='Тестовое вознаграждение',
-            time_to_complete=85,
+            last_completed=datetime.utcnow(),
             is_public=True,
         )
 
@@ -48,7 +50,7 @@ class HabitAPITestCase(APITestCase):
         )
 
     def test_habit_detail(self):
-        response = self.client.get(reverse('habit', args=[self.habit.id]))
+        response = self.client.get(reverse('read_one_habit', args=[self.habit.id]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(),
@@ -63,6 +65,8 @@ class HabitAPITestCase(APITestCase):
                 'reward': self.habit.reward,
                 'time_to_complete': self.habit.time_to_complete,
                 'is_public': self.habit.is_public,
+
+
             }
         )
 
