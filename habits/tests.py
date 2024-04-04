@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
@@ -14,12 +16,12 @@ class HabitAPITestCase(APITestCase):
         self.habit = Habit.objects.create(
             owner=self.user,
             place='Тестовое место',
-            time='15:00:00',
+            duration='15:00:00',
             action='Тестовое действие',
             nice_feeling=False,
-            period='1',
+            periodicity='1',
             reward='Тестовое вознаграждение',
-            time_to_complete=85,
+            last_completed=datetime.utcnow(),
             is_public=True,
         )
 
@@ -53,17 +55,16 @@ class HabitAPITestCase(APITestCase):
         self.assertEqual(
             response.json(),
             {
-                "id": self.habit.id,
-                "action": self.habit.action,
-                "nice_feeling": self.habit.nice_feeling,
-                "periodicity": self.habit.periodicity,
-                "last_completed": self.habit.last_completed,
-                "is_public": self.habit.is_public,
-                "owner": self.habit.owner,
-                "place": self.habit.place,
-                "duration": self.habit.duration,
-                "related_habit": self.habit.related_habit,
-                "reward": self.habit.reward
+                'id': self.habit.id,
+                'place': self.habit.place,
+                'time': self.habit.time,
+                'action': self.habit.action,
+                'is_pleasant': self.habit.is_pleasant,
+                'foreign_habit': self.habit.foreign_habit,
+                'period': self.habit.period,
+                'reward': self.habit.reward,
+                'time_to_complete': self.habit.time_to_complete,
+                'is_public': self.habit.is_public,
             }
         )
 
