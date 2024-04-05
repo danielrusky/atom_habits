@@ -96,8 +96,6 @@ class HabitAPITestCase(APITestCase):
         )
         response = self.client.patch(reverse('habits:habit_update', args=[self.habit.id]), data=data)
         self.assertEqual(response.status_code, 200)
-        # import pdb
-        # pdb.set_trace()
         self.assertEqual(
             response.json(),
             {
