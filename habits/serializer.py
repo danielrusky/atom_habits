@@ -16,6 +16,8 @@ class HabitSerializer(serializers.ModelSerializer):
                   'related_habit', 'reward']
 
     def validate(self, data):
+        if not data.get('related_habit'):
+            return data
         # Проверка одновременного заполнения полей вознаграждение и связанная_привычка
         validate_reward_and_habit(
             data['reward'], data['related_habit']
@@ -29,6 +31,7 @@ class HabitSerializer(serializers.ModelSerializer):
         validate_enjoyable_habit_without_reward_or_association(
             data['nice_feeling'], data['reward'], data['related_habit']
         )
+        return data
 
 
 class HabitListSerializer(serializers.ModelSerializer):
