@@ -16,7 +16,7 @@ class HabitAPITestCase(APITestCase):
         self.habit = Habit.objects.create(
             owner=self.user,
             place='Тестовое место',
-            duration='15:00:00',
+            duration='00:01:00',
             action='Тестовое действие',
             nice_feeling=False,
             periodicity=1,
@@ -72,7 +72,7 @@ class HabitAPITestCase(APITestCase):
         data = dict(
             owner=self.user.id,
             place='Тестовое место 2',
-            duration='15:00:00',
+            duration='00:00:20',
             action='Тестовое действие 2',
             nice_feeling=False,
             periodicity='1',
@@ -84,10 +84,35 @@ class HabitAPITestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Habit.objects.count(), 2)
 
+    def test_habit_create_with_related_habit(self):
+        habit = Habit.objects.create(
+            owner=self.user,
+            place='Тестовое место',
+            duration='00:00:60',
+            action='Тестовое действие',
+            nice_feeling=True,
+            periodicity=1,
+            last_completed=datetime.utcnow(),
+            is_public=True,
+        )
+        data = dict(
+            owner=self.user.id,
+            place='Тестовое место 2',
+            duration='00:00:60',
+            action='Тестовое действие 2',
+            nice_feeling=False,
+            periodicity='1',
+            last_completed=datetime.utcnow().strftime("%Y-%m-%d"),
+            is_public=True,
+            related_habit=habit.id
+        )
+        response = self.client.post(reverse('habits:habit_create'), data=data)
+        self.assertEqual(response.status_code, 201)
+
     def test_habit_update(self):
         data = dict(
             place='Тестовое место 4',
-            duration='15:00:00',
+            duration='00:00:20',
             action='Тестовое действие 4',
             nice_feeling=False,
             periodicity=1,
